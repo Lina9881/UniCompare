@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCompare — Log In</title>
+    <link rel="stylesheet" href="table.css">
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Genos:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css"> 
+</head>
+<body>
+
+    <!-- NAVBAR -->
+<nav class="navbar">
+    <a href="index.html" class="logo">UniCompare</a>
+    <ul class="nav-links">
+        <li><a href="index.html">About</a></li>
+        <li><a href="table.html">Universities' Table</a></li>
+        <li><a href="documents.html">Documents' list</a></li>
+        <li><a href="forum.html">Forum</a></li>
+    </ul>
+</nav>
+
+    <!-- LOGIN CARD -->
+    <section class="login-screen">
+        <div class="login-card">
+            <h1>My University Table</h1>
+            <p>Log in with your email to access your personal table</p>
+
+            <form class="login-form" id="loginForm">
+                <label for="emailInput">Email address</label>
+                <input
+                    type="email"
+                    id="emailInput"
+                    placeholder="you@example.com"
+                    required
+                    autocomplete="email"
+                />
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-arrow-right"></i> Continue
+                </button>
+            </form>
+
+            <p class="login-note">
+                No password needed — your table is saved to your email locally.
+            </p>
+        </div>
+    </section>
+
+    <script>
+        // if already logged in, skip straight to table
+        if (sessionStorage.getItem('uc_email')) {
+            window.location.href = 'table.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value.trim().toLowerCase();
+            if (!email) return;
+            sessionStorage.setItem('uc_email', email);
+            window.location.href = 'table.html';
+        });
+    </script>
+
+</body>
+</html>

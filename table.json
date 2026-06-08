@@ -1,0 +1,388 @@
+// ══ AUTH GUARD ══
+var email = sessionStorage.getItem('uc_email');
+if (!email) { window.location.href = 'login.html'; }
+document.getElementById('navEmail').textContent = email;
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    sessionStorage.removeItem('uc_email');
+    window.location.href = 'login.html';
+});
+
+// ══ STORAGE KEYS ══
+var STORE_KEY = 'uc_table_' + email;
+var DOCS_KEY  = 'uc_docs_'  + email;
+
+// ══ LOAD DATA ══
+var rows = [];
+try {
+    var raw = localStorage.getItem(STORE_KEY);
+    rows = raw ? JSON.parse(raw) : [];
+} catch(e) { rows = []; }
+
+var tbody    = document.getElementById('tblBody');
+var emptyMsg = document.getElementById('emptyMsg');
+var tblWrap  = document.getElementById('tblWrap');
+var toast    = document.getElementById('toast');
+
+renderAll();
+
+// ══ ADD ROW ══
+document.getElementById('addRowBtn').addEventListener('click', function() {
+    rows.push({
+        id:       uid(),
+        uni:      '',
+        prog:     '',
+        loc:      '',
+        tuition:  'free',
+        tuAmt:    '',
+        tuCur:    'EUR',
+        tuPer:    'year',
+        sch:      'not-provided',
+        schText:  '',
+        hou:      'not-provided',
+        houText:  '',
+        deadline: '',
+        docs:     '',
+        stage:    ''
+    });
+    renderAll();
+});
+
+// ══ SAVE ══
+document.getElementById('saveBtn').addEventListener('click', function() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(rows));
+    showToast();
+});
+
+// ════════════════════════════════════════
+// LOAD DOC LISTS FROM DOCUMENTS PAGE
+// ════════════════════════════════════════
+function getDocLists() {
+    try {
+        var raw = localStorage.getItem(DOCS_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+}
+
+// ════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════
+function renderAll() {
+    tbody.innerHTML = '';
+
+    if (rows.length === 0) {
+        emptyMsg.style.display = 'block';
+        tblWrap.style.display  = 'none';
+    } else {
+        emptyMsg.style.display = 'none';
+        tblWrap.style.display  = 'block';
+        rows.forEach(function(row, idx) {
+            tbody.appendChild(buildRow(row, idx));
+        });
+    }
+}
+
+// ════════════════════════════════════════
+// BUILD ROW
+// ════════════════════════════════════════
+function buildRow(row, idx) {
+    var tr = document.createElement('tr');
+
+    // ── # ──
+    var tdNum = document.createElement('td');
+    tdNum.className = 'rn';
+    tdNum.textContent = idx + 1;
+    tr.appendChild(tdNum);
+
+    // ── University ──
+    tr.appendChild(makeTextCell(row, 'uni', 'University name'));
+
+    // ── Programme ──
+    tr.appendChild(makeTextCell(row, 'prog', 'Programme name'));
+
+    // ── Location ──
+    tr.appendChild(makeTextCell(row, 'loc', 'City, Country'));
+
+    // ── Tuition ──
+    var tdTui = document.createElement('td');
+    var tuiWrap = document.createElement('div');
+    tuiWrap.className = 'tuition-wrap';
+
+    // free / paid select
+    var tuiSel = document.createElement('select');
+    tuiSel.className = 'ci';
+    [['free','Free'],['paid','Paid']].forEach(function(o) {
+        var opt = document.createElement('option');
+        opt.value = o[0]; opt.textContent = o[1];
+        if (row.tuition === o[0]) opt.selected = true;
+        tuiSel.appendChild(opt);
+    });
+    styleSelectColor(tuiSel, {
+        'free': 'val-free',
+        'paid': 'val-paid'
+    });
+    tuiSel.addEventListener('change', function() {
+        row.tuition = tuiSel.value;
+        styleSelectColor(tuiSel, { 'free':'val-free','paid':'val-paid' });
+        toggleTuitionExtras(row.tuition, amtRow, curPerRow);
+    });
+
+    // amount row
+    var amtRow = document.createElement('div');
+    amtRow.className = 'tuition-amount-row';
+    var amtInput = document.createElement('input');
+    amtInput.type = 'text';
+    amtInput.className = 'ci';
+    amtInput.placeholder = 'Amount';
+    amtInput.value = row.tuAmt || '';
+    amtInput.addEventListener('input', function() { row.tuAmt = amtInput.value; });
+    amtRow.appendChild(amtInput);
+
+    // currency / per row
+    var curPerRow = document.createElement('div');
+    curPerRow.className = 'tuition-cur-per-row';
+
+    var curSel = document.createElement('select');
+    curSel.className = 'ci';
+    ['EUR','USD','GBP','Other'].forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        if (row.tuCur === c) opt.selected = true;
+        curSel.appendChild(opt);
+    });
+    curSel.addEventListener('change', function() { row.tuCur = curSel.value; });
+
+    var perSel = document.createElement('select');
+    perSel.className = 'ci';
+    ['year','semester','month'].forEach(function(p) {
+        var opt = document.createElement('option');
+        opt.value = p; opt.textContent = '/ ' + p;
+        if (row.tuPer === p) opt.selected = true;
+        perSel.appendChild(opt);
+    });
+    perSel.addEventListener('change', function() { row.tuPer = perSel.value; });
+
+    curPerRow.appendChild(curSel);
+    curPerRow.appendChild(perSel);
+
+    tuiWrap.appendChild(tuiSel);
+    tuiWrap.appendChild(amtRow);
+    tuiWrap.appendChild(curPerRow);
+    toggleTuitionExtras(row.tuition, amtRow, curPerRow);
+    tdTui.appendChild(tuiWrap);
+    tr.appendChild(tdTui);
+
+    // ── Scholarship ──
+    tr.appendChild(makeProvidedCell(row, 'sch', 'schText', 'e.g. 50% tuition waiver'));
+
+    // ── Housing ──
+    tr.appendChild(makeProvidedCell(row, 'hou', 'houText', 'e.g. On-campus dorm'));
+
+    // ── Deadline ──
+    var tdDead = document.createElement('td');
+    var deadInput = document.createElement('input');
+    deadInput.type = 'date';
+    deadInput.className = 'ci';
+    deadInput.value = row.deadline || '';
+    deadInput.addEventListener('change', function() { row.deadline = deadInput.value; });
+    tdDead.appendChild(deadInput);
+    tr.appendChild(tdDead);
+
+    // ── Required Documents — DROPDOWN from Documents' List page ──
+    var tdDocs = document.createElement('td');
+    var docSel = document.createElement('select');
+    docSel.className = 'ci';
+
+    // placeholder option
+    var noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— Select list —';
+    docSel.appendChild(noneOpt);
+
+    // populate from saved doc lists
+    var docLists = getDocLists();
+    if (docLists.length === 0) {
+        var noOpt = document.createElement('option');
+        noOpt.value = '';
+        noOpt.disabled = true;
+        noOpt.textContent = 'No lists saved yet';
+        docSel.appendChild(noOpt);
+    } else {
+        docLists.forEach(function(list) {
+            var opt = document.createElement('option');
+            opt.value = list.id;
+            opt.textContent = list.title;
+            if (row.docs === list.id) opt.selected = true;
+            docSel.appendChild(opt);
+        });
+    }
+
+    docSel.value = row.docs || '';
+    docSel.addEventListener('change', function() {
+        row.docs = docSel.value;
+    });
+
+    tdDocs.appendChild(docSel);
+    tr.appendChild(tdDocs);
+
+    // ── Application Stage ──
+    // ── Application Stage ──
+var tdStage = document.createElement('td');
+var stageWrap = document.createElement('div');
+stageWrap.className = 'stage-wrap';                    // ✅ no class on load
+
+var stageSel = document.createElement('select');
+stageSel.className = 'ci';
+[
+    ['', '— Stage —'],
+    ['considering',  'Considering'],
+    ['planning',     'Planning to Apply'],
+    ['not-planning', 'Not Planning'],
+    ['applied',      'Applied'],
+    ['accepted',     'Accepted'],
+    ['not-accepted', 'Not Accepted']
+].forEach(function(o) {
+    var opt = document.createElement('option');
+    opt.value = o[0]; opt.textContent = o[1];
+    if (row.stage === o[0]) opt.selected = true;
+    stageSel.appendChild(opt);
+});
+
+// ✅ only color if a real option is already saved
+if (row.stage !== '') {
+    stageWrap.className = 'stage-wrap ' + stageClass(row.stage);
+}
+
+stageSel.addEventListener('change', function() {
+    row.stage = stageSel.value;
+    // ✅ only color if user picked a real option, clear if back to default
+    if (stageSel.value === '') {
+        stageWrap.className = 'stage-wrap';
+    } else {
+        stageWrap.className = 'stage-wrap ' + stageClass(stageSel.value);
+    }
+});
+
+stageWrap.appendChild(stageSel);
+tdStage.appendChild(stageWrap);
+tr.appendChild(tdStage);
+    // ── Delete ──
+    var tdDel = document.createElement('td');
+    var delBtn = document.createElement('button');
+    delBtn.className = 'delbtn';
+    delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    delBtn.title = 'Remove row';
+    delBtn.addEventListener('click', function() {
+        rows = rows.filter(function(r) { return r.id !== row.id; });
+        renderAll();
+    });
+    tdDel.appendChild(delBtn);
+    tr.appendChild(tdDel);
+
+    return tr;
+}
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+
+// plain text / textarea cell
+function makeTextCell(row, field, placeholder) {
+    var td = document.createElement('td');
+    var ta = document.createElement('textarea');
+    ta.className = 'ci';
+    ta.placeholder = placeholder;
+    ta.value = row[field] || '';
+    ta.rows = 1;
+    ta.addEventListener('input', function() {
+        row[field] = ta.value;
+        autoResize(ta);
+    });
+    autoResize(ta);
+    td.appendChild(ta);
+    return td;
+}
+
+// provided / not-provided cell with optional text
+function makeProvidedCell(row, selField, txtField, placeholder) {
+    var td = document.createElement('td');
+
+    var sel = document.createElement('select');
+    sel.className = 'ci';
+    [['provided','Provided'],['not-provided','Not Provided']].forEach(function(o) {
+        var opt = document.createElement('option');
+        opt.value = o[0]; opt.textContent = o[1];
+        if (row[selField] === o[0]) opt.selected = true;
+        sel.appendChild(opt);
+    });
+    styleSelectColor(sel, {
+        'provided':     'val-provided',
+        'not-provided': 'val-not-provided'
+    });
+    td.appendChild(sel);
+
+    var extra = document.createElement('div');
+    extra.className = 'prov-text';
+    var extraInput = document.createElement('input');
+    extraInput.type = 'text';
+    extraInput.className = 'ci';
+    extraInput.placeholder = placeholder;
+    extraInput.value = row[txtField] || '';
+    extraInput.addEventListener('input', function() { row[txtField] = extraInput.value; });
+    extra.appendChild(extraInput);
+    td.appendChild(extra);
+
+    toggleProvText(row[selField], extra);
+    sel.addEventListener('change', function() {
+        row[selField] = sel.value;
+        styleSelectColor(sel, {
+            'provided':     'val-provided',
+            'not-provided': 'val-not-provided'
+        });
+        toggleProvText(sel.value, extra);
+    });
+
+    return td;
+}
+
+function toggleTuitionExtras(val, amtRow, curPerRow) {
+    var show = val === 'paid';
+    amtRow.style.display    = show ? 'block' : 'none';
+    curPerRow.style.display = show ? 'flex'  : 'none';
+}
+
+function toggleProvText(val, el) {
+    el.style.display = val === 'provided' ? 'block' : 'none';
+}
+
+function styleSelectColor(sel, map) {
+    Object.keys(map).forEach(function(k) { sel.classList.remove(map[k]); });
+    if (map[sel.value]) sel.classList.add(map[sel.value]);
+}
+
+function stageClass(val) {
+    var map = {
+        '':             'stage-default',
+        'considering':  'stage-considering',
+        'planning':     'stage-planning',
+        'not-planning': 'stage-not-planning',
+        'applied':      'stage-applied',
+        'accepted':     'stage-accepted',
+        'not-accepted': 'stage-not-accepted'
+    };
+    return map[val] || 'stage-default';
+}
+
+function autoResize(ta) {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+}
+
+function uid() {
+    return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+}
+
+function showToast() {
+    toast.style.display = 'flex';
+    setTimeout(function() { toast.style.display = 'none'; }, 3000);
+}

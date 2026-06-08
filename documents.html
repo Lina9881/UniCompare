@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCompare — Documents' List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Genos:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="documents.css">
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+    <a href="index.html" class="logo">UniCompare</a>
+    <ul class="nav-links">
+        <li><a href="index.html">About</a></li>
+        <li><a href="table.html">Universities Table</a></li>
+        <li><a href="documents.html" class="active">Application Documents</a></li>
+        <li><a href="forum.html">Forum</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:1rem;">
+        <span id="navEmail" style="color:#888;font-size:0.88rem;"></span>
+        <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+</nav>
+
+<!-- ══ PAGE ══ -->
+<div class="page">
+
+    <!-- top bar -->
+    <div class="top-bar">
+        <div>
+            <h1>List of Documents</h1>
+            <p>Make lists of documents needed for your application. Use one of our lists or create your own.</p>
+        </div>
+        <div class="top-buttons">
+            <button class="btn-add" id="addListBtn">+ Add List</button>
+            <button class="btn-save" id="saveBtn">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- lists container -->
+    <div class="lists-grid" id="listsGrid"></div>
+
+</div>
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Edit List</h2>
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="modal-body">
+            <label class="modal-label">List Title</label>
+            <input class="modal-input" type="text" id="modalTitle" placeholder="e.g. USA Application Documents">
+
+            <label class="modal-label" style="margin-top:1.2rem;">Documents</label>
+            <div id="modalItems"></div>
+
+            <button class="btn-add-item" id="addItemBtn">
+                <i class="fas fa-plus"></i> Add Document
+            </button>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" id="modalCancel">Cancel</button>
+            <button class="btn-confirm" id="modalConfirm">Save List</button>
+        </div>
+    </div>
+</div>
+
+<!-- toast -->
+<div id="toast"><i class="fas fa-check"></i> Changes saved!</div>
+
+<script>
+
+// ══ AUTH GUARD ══
+var email = sessionStorage.getItem('uc_email');
+if (!email) { window.location.href = 'login.html'; }
+document.getElementById('navEmail').textContent = email;
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    sessionStorage.removeItem('uc_email');
+    window.location.href = 'login.html';
+});
+
+// ══ STORAGE KEY ══
+var STORE_KEY = 'uc_docs_' + email;
+
+// ══ DEFAULT LISTS ══
+var DEFAULT_LISTS = [
+    {
+        id: uid(),
+        title: 'USA Application Documents',
+        items: [
+            { text: 'Official Transcripts',        checked: false },
+            { text: 'Application Essay',           checked: false },
+            { text: 'Letters of Recommendation',  checked: false },
+            { text: 'SAT / ACT',                  checked: false },
+            { text: 'English Proficiency Test',   checked: false },
+            { text: 'Resume/CV',                  checked: false }
+        ]
+    },
+    {
+        id: uid(),
+        title: 'EU Application Documents',
+        items: [
+            { text: 'Official Transcripts',                    checked: false },
+            { text: 'Application Essay / Motivation Letter',   checked: false },
+            { text: 'Letters of Recommendation',              checked: false },
+            { text: 'Diploma or Degree',                      checked: false },
+            { text: 'Language Proficiency Test',              checked: false },
+            { text: 'Resume/CV',                              checked: false }
+        ]
+    }
+];
+
+// ══ LOAD DATA ══
+var lists = [];
+try {
+    var raw = localStorage.getItem(STORE_KEY);
+    lists = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_LISTS));
+} catch(e) {
+    lists = JSON.parse(JSON.stringify(DEFAULT_LISTS));
+}
+
+var grid = document.getElementById('listsGrid');
+var toast = document.getElementById('toast');
+
+renderAll();
+
+// ══ ADD LIST ══
+document.getElementById('addListBtn').addEventListener('click', function() {
+    openModal(null);
+});
+
+// ══ SAVE ══
+document.getElementById('saveBtn').addEventListener('click', function() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(lists));
+    showToast();
+});
+
+// ════════════════════════════════════════
+// RENDER ALL LISTS
+// ════════════════════════════════════════
+function renderAll() {
+    grid.innerHTML = '';
+    lists.forEach(function(list) {
+        grid.appendChild(buildCard(list));
+    });
+}
+
+// ════════════════════════════════════════
+// BUILD CARD
+// ════════════════════════════════════════
+function buildCard(list) {
+    var card = document.createElement('div');
+    card.className = 'doc-card';
+    card.dataset.id = list.id;
+
+    // header
+    var header = document.createElement('div');
+    header.className = 'card-header';
+
+    var title = document.createElement('span');
+    title.className = 'card-title';
+    title.textContent = list.title;
+
+    var editBtn = document.createElement('button');
+    editBtn.className = 'card-edit-btn';
+    editBtn.title = 'Edit list';
+    editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+    editBtn.addEventListener('click', function() { openModal(list.id); });
+
+    header.appendChild(title);
+    header.appendChild(editBtn);
+
+    // body
+    var body = document.createElement('div');
+    body.className = 'card-body';
+
+    list.items.forEach(function(item, idx) {
+        var row = document.createElement('label');
+        row.className = 'doc-row' + (item.checked ? ' checked' : '');
+
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'doc-cb';
+        cb.checked = item.checked;
+        cb.addEventListener('change', function() {
+            item.checked = cb.checked;
+            row.classList.toggle('checked', cb.checked);
+            // auto-save checkboxes
+            localStorage.setItem(STORE_KEY, JSON.stringify(lists));
+        });
+
+        var span = document.createElement('span');
+        span.className = 'doc-name';
+        span.textContent = item.text;
+
+        row.appendChild(cb);
+        row.appendChild(span);
+        body.appendChild(row);
+    });
+
+    card.appendChild(header);
+    card.appendChild(body);
+    return card;
+}
+
+// ════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════
+var overlay     = document.getElementById('modalOverlay');
+var modalTitle  = document.getElementById('modalTitle');
+var modalItems  = document.getElementById('modalItems');
+var currentId   = null;  // null = new list
+
+function openModal(id) {
+    currentId = id;
+    modalItems.innerHTML = '';
+
+    if (id) {
+        // editing existing
+        var list = lists.find(function(l) { return l.id === id; });
+        modalTitle.value = list.title;
+        list.items.forEach(function(item) {
+            addModalItem(item.text);
+        });
+    } else {
+        // new list
+        modalTitle.value = '';
+        addModalItem('');
+    }
+
+    overlay.classList.add('open');
+    modalTitle.focus();
+}
+
+function closeModal() {
+    overlay.classList.remove('open');
+    currentId = null;
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+});
+
+// add item row inside modal
+document.getElementById('addItemBtn').addEventListener('click', function() {
+    addModalItem('');
+});
+
+function addModalItem(val) {
+    var row = document.createElement('div');
+    row.className = 'modal-item-row';
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'modal-item-input';
+    input.placeholder = 'Document name';
+    input.value = val;
+
+    var del = document.createElement('button');
+    del.className = 'modal-item-del';
+    del.innerHTML = '<i class="fas fa-trash"></i>';
+    del.title = 'Remove';
+    del.addEventListener('click', function() {
+        row.remove();
+    });
+
+    row.appendChild(input);
+    row.appendChild(del);
+    modalItems.appendChild(row);
+    input.focus();
+}
+
+// confirm / save modal
+document.getElementById('modalConfirm').addEventListener('click', function() {
+    var title = modalTitle.value.trim();
+    if (!title) { modalTitle.focus(); return; }
+
+    var inputs = modalItems.querySelectorAll('.modal-item-input');
+    var items = [];
+    inputs.forEach(function(inp) {
+        var t = inp.value.trim();
+        if (t) items.push({ text: t, checked: false });
+    });
+
+    if (currentId) {
+        // update existing — preserve checked state
+        var list = lists.find(function(l) { return l.id === currentId; });
+        var oldItems = list.items;
+        list.title = title;
+        list.items = items.map(function(ni) {
+            var old = oldItems.find(function(o) { return o.text === ni.text; });
+            return { text: ni.text, checked: old ? old.checked : false };
+        });
+    } else {
+        // new list
+        lists.push({ id: uid(), title: title, items: items });
+    }
+
+    localStorage.setItem(STORE_KEY, JSON.stringify(lists));
+    renderAll();
+    closeModal();
+});
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function uid() {
+    return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+}
+
+function showToast() {
+    toast.style.display = 'flex';
+    setTimeout(function() { toast.style.display = 'none'; }, 3000);
+}
+
+</script>
+</body>
+</html>

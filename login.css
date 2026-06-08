@@ -1,0 +1,204 @@
+/* ══════════════════════════════════════════
+   RESET
+══════════════════════════════════════════ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ══════════════════════════════════════════
+   BODY
+══════════════════════════════════════════ */
+body {
+    font-family: 'Genos', sans-serif;
+    background: #f7f5ff;
+    color: #1a1a2e;
+    min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════ */
+.navbar {
+    background: #ffffff;
+    padding: 0.9rem 2.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .logo {
+    font-family: 'Righteous', cursive;
+    font-size: 1.2rem;
+    color: #1a1a2e;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
+
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar .nav-links a {
+    color: #555;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-family: 'Genos', sans-serif;
+    transition: color 0.2s;
+}
+
+.navbar .nav-links a:hover {
+    color: #1a1a2e;
+}
+
+.navbar .nav-links a.active {
+    color: #5200cc;
+    font-weight: 700;
+}
+
+/* ══════════════════════════════════════════
+   LOGIN SCREEN — centered layout
+══════════════════════════════════════════ */
+.login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    padding: 2rem;
+}
+
+/* ══════════════════════════════════════════
+   LOGIN CARD
+══════════════════════════════════════════ */
+.login-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 3rem 2.8rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 40px rgba(82, 0, 204, 0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.login-card h1 {
+    font-family: 'Genos', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.2;
+}
+
+.login-card > p {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════
+   FORM
+══════════════════════════════════════════ */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+.login-form label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.login-form input[type="email"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: 'Genos', sans-serif;
+    font-size: 1rem;
+    color: #1a1a2e;
+    background: #faf5ff;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.login-form input[type="email"]::placeholder {
+    color: #bbb;
+}
+
+.login-form input[type="email"]:focus {
+    border-color: #5200cc;
+    background: #ffffff;
+}
+
+/* ══════════════════════════════════════════
+   SUBMIT BUTTON
+══════════════════════════════════════════ */
+.btn-primary {
+    margin-top: 0.4rem;
+    width: 100%;
+    background: #e85d04;
+    color: #ffffff;
+    border: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Genos', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+    background: #c94d00;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* ══════════════════════════════════════════
+   LOGIN NOTE
+══════════════════════════════════════════ */
+.login-note {
+    font-size: 0.82rem;
+    color: #bbb;
+    text-align: center;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 500px) {
+    .login-card {
+        padding: 2rem 1.4rem;
+    }
+
+    .login-card h1 {
+        font-size: 1.6rem;
+    }
+
+    .navbar .nav-links {
+        gap: 1rem;
+    }
+}

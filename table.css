@@ -1,0 +1,431 @@
+/* ══════════════════════════════════════════
+   RESET
+══════════════════════════════════════════ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ══════════════════════════════════════════
+   BODY
+══════════════════════════════════════════ */
+body {
+    font-family: 'Genos', sans-serif;
+    background: #ffffff;
+    color: #1a1a2e;
+}
+
+/* ══════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════ */
+.navbar {
+    background: #ffffff;
+    padding: 0.9rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* ✅ CHANGE 1 — no border on logo */
+.navbar .logo {
+    font-family: 'Righteous', cursive;
+    font-size: 1.2rem;
+    color: #1a1a2e;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
+
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.navbar .nav-links a {
+    color: #555;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-family: 'Genos', sans-serif;
+    transition: color 0.2s;
+}
+
+.navbar .nav-links a:hover {
+    color: #1a1a2e;
+}
+
+.navbar .nav-links a.active {
+    color: #1a1a2e;
+    font-weight: 700;
+}
+
+.btn-logout {
+    background: #e85d04;
+    border: none;
+    color: #ffffff;
+    padding: 0.5rem 1.4rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: 'Genos', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+
+.btn-logout:hover {
+    background: #c94d00;
+}
+
+/* ══════════════════════════════════════════
+   PAGE WRAPPER
+══════════════════════════════════════════ */
+.page {
+    width: 100%;
+    padding: 2rem 2rem;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR — title only, no buttons
+══════════════════════════════════════════ */
+.top-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.top-bar h1 {
+    font-size: 2rem;
+    color: #1a1a2e;
+    font-family: 'Genos', sans-serif;
+    font-weight: 700;
+}
+
+/* ✅ title left, buttons right, vertically centered */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* ✅ no extra margin needed */
+.top-buttons {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* ADD button — lime green pill */
+.btn-add {
+    background: #aaff00;
+    color: #1a1a2e;
+    border: none;
+    padding: 0.65rem 1.6rem;
+    border-radius: 50px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Genos', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+
+.btn-add:hover {
+    background: #88dd00;
+}
+
+/* SAVE button — orange pill */
+.btn-save {
+    background: #e85d04;
+    color: #ffffff;
+    border: none;
+    padding: 0.65rem 1.6rem;
+    border-radius: 50px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Genos', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.2s;
+}
+
+.btn-save:hover {
+    background: #c94d00;
+}
+
+/* ══════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════ */
+#emptyMsg {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #bbb;
+}
+
+#emptyMsg i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    color: #ddd;
+}
+
+#emptyMsg p {
+    font-size: 1.1rem;
+}
+
+/* ══════════════════════════════════════════
+   TABLE WRAPPER
+   ✅ CHANGE 3 — 20px top corners only
+══════════════════════════════════════════ */
+#tblWrap {
+    width: 100%;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    box-shadow: none;
+    display: none;
+    overflow: hidden;
+}
+
+/* ══════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+col.c-num      { width: 3%; }
+col.c-uni      { width: 11%; }
+col.c-prog     { width: 10%; }
+col.c-loc      { width: 9%; }
+col.c-tuition  { width: 13%; }
+col.c-sch      { width: 11%; }
+col.c-hou      { width: 11%; }
+col.c-dead     { width: 8%; }
+col.c-docs     { width: 12%; }
+col.c-stage    { width: 10%; }
+col.c-del      { width: 3%; }
+
+/* ── Header ── */
+thead tr {
+    background: #5200cc;
+}
+
+thead th {
+    color: #ffff00;
+    padding: 0.9rem 0.6rem;
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 700;
+    word-break: break-word;
+    font-family: 'Genos', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── Body rows ── */
+tbody tr {
+    border-bottom: 1px solid #ebebeb;
+    background: #fff;
+    transition: background 0.15s;
+}
+
+tbody tr:hover {
+    background: #fafbff;
+}
+
+tbody td {
+    padding: 0.55rem 0.5rem;
+    vertical-align: top;
+}
+
+/* ══════════════════════════════════════════
+   INPUTS / SELECTS / TEXTAREAS
+══════════════════════════════════════════ */
+.ci {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 7px;
+    font-size: 0.83rem;
+    font-family: 'Genos', sans-serif;
+    background: #fafafa;
+    color: #1a1a2e;
+    word-break: break-word;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ci:focus {
+    outline: none;
+    border-color: #5200cc;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(82,0,204,0.10);
+}
+
+textarea.ci {
+    resize: vertical;
+    min-height: 52px;
+}
+
+select.ci {
+    cursor: pointer;
+}
+
+/* ══════════════════════════════════════════
+   TUITION LAYOUT
+══════════════════════════════════════════ */
+.tuition-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.tuition-amount-row {
+    display: none;
+}
+
+.tuition-cur-per-row {
+    display: none;
+    gap: 0.3rem;
+}
+
+/* ══════════════════════════════════════════
+   SELECT COLOR STATES
+══════════════════════════════════════════ */
+select[data-f="tuition"].val-free {
+    color: #1a7a3c;
+    font-weight: 700;
+}
+select[data-f="tuition"].val-paid {
+    color: #cc0000;
+    font-weight: 700;
+}
+
+select[data-f="scholarship"].val-provided {
+    color: #1a7a3c;
+    font-weight: 700;
+}
+select[data-f="scholarship"].val-not-provided {
+    color: #cc0000;
+    font-weight: 700;
+}
+
+select[data-f="housing"].val-provided {
+    color: #1a7a3c;
+    font-weight: 700;
+}
+select[data-f="housing"].val-not-provided {
+    color: #cc0000;
+    font-weight: 700;
+}
+
+/* ══════════════════════════════════════════
+   PROVIDED TEXTAREA
+══════════════════════════════════════════ */
+.prov-text {
+    display: none;
+    margin-top: 0.3rem;
+}
+
+/* ══════════════════════════════════════════
+   ROW NUMBER
+══════════════════════════════════════════ */
+.rn {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #5200cc;
+    padding-top: 0.65rem !important;
+}
+
+/* ══════════════════════════════════════════
+   DELETE BUTTON
+══════════════════════════════════════════ */
+.delbtn {
+    background: none;
+    border: none;
+    color: #cc0000;
+    cursor: pointer;
+    font-size: 1.05rem;
+    padding: 0.3rem;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.delbtn:hover {
+    background: #ffe0e0;
+}
+
+/* ══════════════════════════════════════════
+   APPLICATION STAGE
+══════════════════════════════════════════ */
+.stage-wrap {
+    border-radius: 7px;
+    padding: 0.1rem;
+}
+
+.stage-wrap select {
+    background: transparent !important;
+    border: none !important;
+    font-weight: 700;
+    width: 100%;
+    font-family: 'Genos', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.stage-wrap select:focus {
+    outline: none;
+}
+
+.stage-default       { background: #ffffff; }
+.stage-considering   { background: #e8e8e8; }
+.stage-planning      { background: #f0e6ff; }
+.stage-not-planning  { background: #fff3e0; }
+.stage-applied       { background: #e3f0ff; }
+.stage-accepted      { background: #e3f7ec; }
+.stage-not-accepted  { background: #ffe3e3; }
+
+.stage-default       select { color: #888; }
+.stage-considering   select { color: #555; }
+.stage-planning      select { color: #7b2d8b; }
+.stage-not-planning  select { color: #e85d04; }
+.stage-applied       select { color: #0066cc; }
+.stage-accepted      select { color: #1a7a3c; }
+.stage-not-accepted  select { color: #cc0000; }
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+#toast {
+    display: none;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #2d6a4f;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    align-items: center;
+    gap: 0.5rem;
+}
